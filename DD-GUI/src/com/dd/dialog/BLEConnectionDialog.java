@@ -2,20 +2,160 @@ package com.dd.dialog;
 
 import gnu.io.SerialPort;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingWorker;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 import org.thingml.bglib.BDAddr;
 import org.thingml.bglib.BGAPI;
 import org.thingml.bglib.BGAPIListener;
 import org.thingml.bglib.BGAPIPacketLogger;
 import org.thingml.bglib.gui.BLEAttribute;
+import org.thingml.bglib.gui.BLED112;
 import org.thingml.bglib.gui.BLEDevice;
 import org.thingml.bglib.gui.BLEDeviceList;
 import org.thingml.bglib.gui.BLEService;
 
-public class BLEConnectionDialog extends JDialog implements BGAPIListener {
+public class BLEConnectionDialog extends JDialog implements BGAPIListener, ActionListener, PropertyChangeListener {
+	public BLEConnectionDialog() {
+		initialize();
+	}
+	private void initialize() {
+		panel = new JPanel();
+		panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Connection", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_1 = new JPanel();
+		panel_1.setBorder(new TitledBorder(null, "Progress", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(
+				groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+								.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE))
+								.addContainerGap())
+				);
+		groupLayout.setVerticalGroup(
+				groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
+						.addContainerGap(97, Short.MAX_VALUE))
+				);
+		progressBar = new JProgressBar();
+		progressBar.setForeground(SystemColor.controlHighlight);
+		progressBar.setStringPainted(true);
+		scrollPaneLog = new JScrollPane();
+		connLogLabel = new JLabel("Connection Log:");
+		connLogLabel.setForeground(SystemColor.controlHighlight);
+		bledConnectedBtn = new JButton("BLED CONNECTED!");
+		bledConnectedBtn.setEnabled(false);
+		bledConnectedBtn.setForeground(SystemColor.controlHighlight);
+		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
+		gl_panel_1.setHorizontalGroup(
+				gl_panel_1.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_1.createSequentialGroup()
+										.addContainerGap()
+										.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE))
+										.addGroup(gl_panel_1.createSequentialGroup()
+												.addGap(23)
+												.addComponent(connLogLabel)
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addComponent(scrollPaneLog, GroupLayout.PREFERRED_SIZE, 198, GroupLayout.PREFERRED_SIZE)
+												.addGap(18)
+												.addComponent(bledConnectedBtn, GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)))
+												.addContainerGap())
+				);
+		gl_panel_1.setVerticalGroup(
+				gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_1.createSequentialGroup()
+										.addGap(23)
+										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+												.addComponent(connLogLabel)
+												.addComponent(scrollPaneLog, GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)))
+												.addGroup(gl_panel_1.createSequentialGroup()
+														.addGap(51)
+														.addComponent(bledConnectedBtn)))
+														.addContainerGap())
+				);
+		taskLogOutput = new JTextArea();
+		taskLogOutput.setRows(20);
+		taskLogOutput.setColumns(5);
+		scrollPaneLog.setViewportView(taskLogOutput);
+		panel_1.setLayout(gl_panel_1);
+		serialPortLabel = new JLabel("Serial Port:");
+		serialPortLabel.setForeground(SystemColor.controlHighlight);
+		portTextField = new JTextField();
+		portTextField.setColumns(10);
+		browsePortsBtn = new JButton("Find BLED");
+		browsePortsBtn.addActionListener(this);
+		connectBLEDBtn = new JButton("Connect");
+		connectBLEDBtn.addActionListener(this);
+		connectBLEDBtn.setForeground(SystemColor.controlHighlight);
+		disconnectBLEDBtn = new JButton("Disconnect");
+		disconnectBLEDBtn.setEnabled(false);
+		disconnectBLEDBtn.addActionListener(this);
+		disconnectBLEDBtn.setForeground(Color.RED);
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+				gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(serialPortLabel, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(portTextField, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(browsePortsBtn)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(connectBLEDBtn)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(disconnectBLEDBtn)
+						.addContainerGap(17, Short.MAX_VALUE))
+				);
+		gl_panel.setVerticalGroup(
+				gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(serialPortLabel)
+								.addComponent(portTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(browsePortsBtn)
+								.addComponent(connectBLEDBtn)
+								.addComponent(disconnectBLEDBtn))
+								.addContainerGap(7, Short.MAX_VALUE))
+				);
+		panel.setLayout(gl_panel);
+		getContentPane().setLayout(groupLayout);
+	}
 
 	protected BGAPI bgapi;
 	protected SerialPort port;
@@ -63,11 +203,11 @@ public class BLEConnectionDialog extends JDialog implements BGAPIListener {
 			bgapi.send_connection_disconnect(connection);
 		}
 		connection = -1;
-//		jTextFieldConnStatus.setText("Diconnected.");
-//		jButtonConnect.setEnabled(true);
-//		jButtonRefresh.setEnabled(false);
-//		jButtonDisconnect.setEnabled(false);
-//		jButtonDiscover.setEnabled(true);
+		//		jTextFieldConnStatus.setText("Diconnected.");
+		//		jButtonConnect.setEnabled(true);
+		//		jButtonRefresh.setEnabled(false);
+		//		jButtonDisconnect.setEnabled(false);
+		//		jButtonDiscover.setEnabled(true);
 	}
 
 
@@ -89,7 +229,7 @@ public class BLEConnectionDialog extends JDialog implements BGAPIListener {
 	public void receive_system_get_connections(int maxconn) {}
 	public void receive_system_read_memory(int address, byte[] data) {}
 	public void receive_system_get_info(int major, int minor, int patch, int build, int ll_version, int protocol_version, int hw) {
-//		jTextFieldBLED112.setText("Connected. BLED112:" + major + "." + minor + "." + patch + " (" + build + ") " + "ll=" + ll_version + " hw=" + hw);
+		//		jTextFieldBLED112.setText("Connected. BLED112:" + major + "." + minor + "." + patch + " (" + build + ") " + "ll=" + ll_version + " hw=" + hw);
 	}
 	public void receive_system_endpoint_tx() {}
 	public void receive_system_whitelist_append(int result) {}
@@ -133,27 +273,34 @@ public class BLEConnectionDialog extends JDialog implements BGAPIListener {
 
 	protected int connection = -1;
 	protected BLEDevice bledevice = null;
+	private JPanel panel;
+	private JPanel panel_1;
+	private JLabel serialPortLabel;
+	private JTextField portTextField;
+	private JButton browsePortsBtn;
+	private JButton connectBLEDBtn;
+	private JButton disconnectBLEDBtn;
 	public void receive_connection_status(int conn, int flags, BDAddr address, int address_type, int conn_interval, int timeout, int latency, int bonding) {
-//		jTextFieldConnStatus.setText("[" + address.toString() + "] Conn = " + conn + " Flags = " + flags);
-//		if (flags != 0) {
-//			bledevice = deviceList.getFromAddress(address.toString());
-//			this.connection = conn;
-//			jButtonConnect.setEnabled(false);
-//			jButtonRefresh.setEnabled(true);
-//			jButtonDisconnect.setEnabled(true);
-//			jButtonDiscover.setEnabled(false);
-//			if (autoclose) this.setVisible(false);
-//		}
-//		else {
-//			System.out.println("Connection lost!");
-//			connection = -1;
-//			bledevice = null;
-//			jButtonConnect.setEnabled(true);
-//			jButtonRefresh.setEnabled(false);
-//			jButtonDisconnect.setEnabled(false);
-//			jButtonDiscover.setEnabled(true);
-//		} 
-//		autoclose = false;
+		//		jTextFieldConnStatus.setText("[" + address.toString() + "] Conn = " + conn + " Flags = " + flags);
+		//		if (flags != 0) {
+		//			bledevice = deviceList.getFromAddress(address.toString());
+		//			this.connection = conn;
+		//			jButtonConnect.setEnabled(false);
+		//			jButtonRefresh.setEnabled(true);
+		//			jButtonDisconnect.setEnabled(true);
+		//			jButtonDiscover.setEnabled(false);
+		//			if (autoclose) this.setVisible(false);
+		//		}
+		//		else {
+		//			System.out.println("Connection lost!");
+		//			connection = -1;
+		//			bledevice = null;
+		//			jButtonConnect.setEnabled(true);
+		//			jButtonRefresh.setEnabled(false);
+		//			jButtonDisconnect.setEnabled(false);
+		//			jButtonDiscover.setEnabled(true);
+		//		} 
+		//		autoclose = false;
 	}
 	public void receive_connection_version_ind(int connection, int vers_nr, int comp_id, int sub_vers_nr) {}
 	public void receive_connection_feature_ind(int connection, byte[] features) {}
@@ -286,5 +433,89 @@ public class BLEConnectionDialog extends JDialog implements BGAPIListener {
 		for(byte b : bytes) result.append( Integer.toHexString(b & 0xFF) + " ");
 		result.append("]");
 		return result.toString();        
+	}
+
+	Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
+	private Task ble113ConnectionTask;
+
+	/** AUTO GENERATED UI **/
+	private JProgressBar progressBar;
+	private JScrollPane scrollPaneLog;
+	private JLabel connLogLabel;
+	private JButton bledConnectedBtn;
+	private JTextArea taskLogOutput;
+
+
+	/*************************************************************************
+	 * BUTTON HANDLERS 
+	 ************************************************************************/
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == connectBLEDBtn) {
+			connectBLEDBtnActionPerformed(e);
+		}
+		if (e.getSource() == disconnectBLEDBtn) {
+			disconnectBLEDBtnActionPerformed(e);
+		}
+		if (e.getSource() == browsePortsBtn) {
+			browsePortsBtnActionPerformed(e);
+		}
+	}
+
+	protected void browsePortsBtnActionPerformed(ActionEvent e) {
+		portTextField.setText(BLED112.selectSerialPort());
+	}
+
+	protected void disconnectBLEDBtnActionPerformed(ActionEvent e) {
+		//TODO: Implement disconnect from serial port
+	}
+
+	protected void connectBLEDBtnActionPerformed(ActionEvent e) {
+		connectBLEDBtn.setEnabled(false);
+		disconnectBLEDBtn.setEnabled(false);
+		port  = BLED112.connectSerial(portTextField.getText().trim());
+
+		if (port != null) {
+			prefs.put("BLED112Serial", portTextField.getText().trim());
+			try {				
+				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				ble113ConnectionTask = new Task();
+				ble113ConnectionTask.addPropertyChangeListener(this);
+				ble113ConnectionTask.execute();
+
+			} catch (Exception ex) {
+				Logger.getLogger(BLEConnectionDialog.class.getName()).log(Level.SEVERE, null, ex);;
+
+			}
+		}
+
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if ("progress" == evt.getPropertyName()) {
+			int progress = (Integer) evt.getNewValue();
+			progressBar.setValue(progress);
+			taskLogOutput.append(String.format(
+                    "Completed %d%% of task.\n", ble113ConnectionTask.getProgress()));
+		}
+		  
+	}
+
+	/** Class for executing BLE Discovery and Connection **/
+	private class Task extends SwingWorker<Void, Void> {
+		/* Main Task */
+		@Override
+		protected Void doInBackground() throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		/* Executed in event dispatching thread */
+		@Override
+		public void done() {
+
+		}
 	}
 }

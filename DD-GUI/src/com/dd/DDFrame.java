@@ -45,8 +45,6 @@ import com.dd.util.DriverListener;
  */
 public class DDFrame extends JFrame implements ActionListener, DriverListener {
 
-	final static String MAINPANEL = "Main";
-	final static String DICEPANEL = "Dice Program";	
 	final static private String newline = "\n";
 	private String imagedir = "images/";
 
@@ -56,7 +54,6 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 
 	protected BLEConnectionDialog bledialog = new BLEConnectionDialog();
 	protected Driver driver;
-
 
 	public DDFrame() {
 
@@ -105,33 +102,35 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		uploadImagePanel.setBorder(new TitledBorder(null, "Add Images", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
-				groupLayout.createParallelGroup(Alignment.LEADING)
+			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(221)
+							.addComponent(titlePanel, GroupLayout.PREFERRED_SIZE, 532, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(startupPanel, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE)
 								.addGroup(groupLayout.createSequentialGroup()
-										.addComponent(dicePanel, GroupLayout.PREFERRED_SIZE, 626, GroupLayout.PREFERRED_SIZE)
-										.addGap(18)
-										.addComponent(uploadImagePanel, GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
-										.addGroup(groupLayout.createSequentialGroup()
-												.addGap(155)
-												.addComponent(titlePanel, GroupLayout.PREFERRED_SIZE, 532, GroupLayout.PREFERRED_SIZE))
-												.addComponent(startupPanel, GroupLayout.PREFERRED_SIZE, 325, GroupLayout.PREFERRED_SIZE))
-												.addContainerGap())
-				);
+									.addComponent(dicePanel, GroupLayout.PREFERRED_SIZE, 626, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(uploadImagePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+					.addContainerGap())
+		);
 		groupLayout.setVerticalGroup(
-				groupLayout.createParallelGroup(Alignment.LEADING)
+			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-						.addGap(16)
-						.addComponent(titlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGap(27)
-						.addComponent(startupPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGap(19)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(dicePanel, GroupLayout.PREFERRED_SIZE, 340, GroupLayout.PREFERRED_SIZE)
-								.addComponent(uploadImagePanel, 0, 0, Short.MAX_VALUE))
-								.addContainerGap())
-				);
+					.addContainerGap()
+					.addComponent(titlePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(31)
+					.addComponent(startupPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(19)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(dicePanel, GroupLayout.PREFERRED_SIZE, 340, GroupLayout.PREFERRED_SIZE)
+						.addComponent(uploadImagePanel, 0, 0, Short.MAX_VALUE))
+					.addContainerGap())
+		);
 		uploadImageBtn = new JButton("Upload Image");
 		uploadImageBtn.addActionListener(this);
 		addImageToSetBtn = new JButton("Add to Set");
@@ -139,27 +138,27 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		previewLabel = new JLabel("");
 		GroupLayout gl_uploadImagePanel = new GroupLayout(uploadImagePanel);
 		gl_uploadImagePanel.setHorizontalGroup(
-			gl_uploadImagePanel.createParallelGroup(Alignment.LEADING)
+				gl_uploadImagePanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_uploadImagePanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_uploadImagePanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_uploadImagePanel.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(addImageToSetBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(uploadImageBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addComponent(previewLabel, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(131, Short.MAX_VALUE))
-		);
+						.addContainerGap()
+						.addGroup(gl_uploadImagePanel.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_uploadImagePanel.createParallelGroup(Alignment.TRAILING, false)
+										.addComponent(addImageToSetBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(uploadImageBtn, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+										.addComponent(previewLabel, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE))
+										.addContainerGap(131, Short.MAX_VALUE))
+				);
 		gl_uploadImagePanel.setVerticalGroup(
-			gl_uploadImagePanel.createParallelGroup(Alignment.LEADING)
+				gl_uploadImagePanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_uploadImagePanel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(uploadImageBtn)
-					.addGap(18)
-					.addComponent(addImageToSetBtn)
-					.addPreferredGap(ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-					.addComponent(previewLabel, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE)
-					.addGap(33))
-		);
+						.addContainerGap()
+						.addComponent(uploadImageBtn)
+						.addGap(18)
+						.addComponent(addImageToSetBtn)
+						.addPreferredGap(ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+						.addComponent(previewLabel, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE)
+						.addGap(33))
+				);
 		uploadImagePanel.setLayout(gl_uploadImagePanel);
 		btnStart = new JButton("START");
 		btnStart.addActionListener(this);
@@ -202,21 +201,27 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 
 		connectBLEBtn = new JButton("Connect BLE");
 		connectBLEBtn.addActionListener(this);
+		disconnBLEBtn = new JButton("Disconn");
+		disconnBLEBtn.setForeground(Color.RED);
 		GroupLayout gl_startupPanel = new GroupLayout(startupPanel);
 		gl_startupPanel.setHorizontalGroup(
-				gl_startupPanel.createParallelGroup(Alignment.LEADING)
+			gl_startupPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_startupPanel.createSequentialGroup()
-						.addGap(53)
-						.addComponent(connectBLEBtn)
-						.addContainerGap(750, Short.MAX_VALUE))
-				);
+					.addContainerGap()
+					.addComponent(connectBLEBtn)
+					.addPreferredGap(ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+					.addComponent(disconnBLEBtn)
+					.addContainerGap())
+		);
 		gl_startupPanel.setVerticalGroup(
-				gl_startupPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_startupPanel.createSequentialGroup()
-						.addContainerGap()
+			gl_startupPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_startupPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_startupPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(connectBLEBtn, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-						.addContainerGap())
-				);
+						.addComponent(disconnBLEBtn))
+					.addContainerGap())
+		);
 		startupPanel.setLayout(gl_startupPanel);
 
 		JLabel titleLabel = new JLabel("");
@@ -239,6 +244,10 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		getContentPane().setLayout(groupLayout);	
 	}
 
+	/*************************************************************************
+	 * BUTTON HANDLERS 
+	 ************************************************************************/
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == addImageToSetBtn) {
@@ -251,10 +260,6 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 			btnConnectBLEActionPerformed(e);
 		}
 	}		
-
-	/*************************************************************************
-	 * BUTTON HANDLERS 
-	 ************************************************************************/
 
 	protected void btnConnectBLEActionPerformed(ActionEvent e) {
 		reset();
@@ -303,6 +308,7 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		}
 		JButton thumbButton = new JButton(thumbAction);
 		imageToolBar.add(thumbButton, imageToolBar.getComponentCount() - 1);
+		//TODO: Add a clearAddImagePanel Function that resets the image label
 	}
 
 	/**
@@ -320,7 +326,7 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		g2.dispose();
 		return resizedImg;
 	}
-	
+
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected ImageIcon createImageIcon(String path,
 			String description) {
@@ -337,8 +343,6 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		}
 		return null;
 	}
-
-
 
 	public static void main(String[] args) {		
 		/* Use an appropriate Look and Feel */
@@ -368,22 +372,21 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 		});
 	}
 
-	/** UI Components **/
-	private JLabel imageLabel;
-
-	private JFileChooser fc;
-	private FileNameExtensionFilter filter; 
-	private JLabel selectedImage;
-	private ImageIcon imagePreview;
-	private JToolBar imageToolBar; 
-
-	private ImageIcon placeholderIcon;
-
 	/** List of temporary images to load */
 	private String[] imageFileNames = { "angry.png", "cool.png",
 			"evil.png", "ic_action_computer.png", "smiley_face.png"};
 
 	private String[] imageCaptions = { "angry", "cool", "evil", "grin", "happy"};
+
+
+	/** UI Components **/
+	private JLabel imageLabel;
+	private JFileChooser fc;
+	private FileNameExtensionFilter filter; 
+	private ImageIcon imagePreview;
+	private JToolBar imageToolBar; 
+	private ImageIcon placeholderIcon;
+
 
 	private JButton btnStart;
 	private JButton btnStop;
@@ -507,6 +510,7 @@ public class DDFrame extends JFrame implements ActionListener, DriverListener {
 			}
 		}
 	};
+	private JButton disconnBLEBtn;
 
 	/**
 	 * Action class that shows the image specified in it's constructor.
